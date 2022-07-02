@@ -1,14 +1,14 @@
 /**
- * @file       TinyGsmClientSIM800.h
+ * @file       TinyGsmClientSIM7020.h
  * @author     Volodymyr Shymanskyy
  * @license    LGPL-3.0
  * @copyright  Copyright (c) 2016 Volodymyr Shymanskyy
  * @date       Nov 2016
  */
 
-#ifndef SRC_TINYGSMCLIENTSIM800_H_
-#define SRC_TINYGSMCLIENTSIM800_H_
-// #pragma message("TinyGSM:  TinyGsmClientSIM800")
+#ifndef SRC_TINYGSMCLIENTSIM7020_H_
+#define SRC_TINYGSMCLIENTSIM7020_H_
+// #pragma message("TinyGSM:  TinyGsmClientSIM7020")
 
 // #define TINY_GSM_DEBUG Serial
 // #define TINY_GSM_USE_HEX
@@ -44,42 +44,42 @@ enum RegStatus {
   REG_OK_ROAMING   = 5,
   REG_UNKNOWN      = 4,
 };
-class TinyGsmSim800 : public TinyGsmModem<TinyGsmSim800>,
-                      public TinyGsmGPRS<TinyGsmSim800>,
-                      public TinyGsmTCP<TinyGsmSim800, TINY_GSM_MUX_COUNT>,
-                      public TinyGsmSSL<TinyGsmSim800>,
-                      public TinyGsmCalling<TinyGsmSim800>,
-                      public TinyGsmSMS<TinyGsmSim800>,
-                      public TinyGsmGSMLocation<TinyGsmSim800>,
-                      public TinyGsmTime<TinyGsmSim800>,
-                      public TinyGsmNTP<TinyGsmSim800>,
-                      public TinyGsmBattery<TinyGsmSim800> {
-  friend class TinyGsmModem<TinyGsmSim800>;
-  friend class TinyGsmGPRS<TinyGsmSim800>;
-  friend class TinyGsmTCP<TinyGsmSim800, TINY_GSM_MUX_COUNT>;
-  friend class TinyGsmSSL<TinyGsmSim800>;
-  friend class TinyGsmCalling<TinyGsmSim800>;
-  friend class TinyGsmSMS<TinyGsmSim800>;
-  friend class TinyGsmGSMLocation<TinyGsmSim800>;
-  friend class TinyGsmTime<TinyGsmSim800>;
-  friend class TinyGsmNTP<TinyGsmSim800>;
-  friend class TinyGsmBattery<TinyGsmSim800>;
+class TinyGsmSim7020 : public TinyGsmModem<TinyGsmSim7020>,
+                      public TinyGsmGPRS<TinyGsmSim7020>,
+                      public TinyGsmTCP<TinyGsmSim7020, TINY_GSM_MUX_COUNT>,
+                      public TinyGsmSSL<TinyGsmSim7020>,
+                      public TinyGsmCalling<TinyGsmSim7020>,
+                      public TinyGsmSMS<TinyGsmSim7020>,
+                      public TinyGsmGSMLocation<TinyGsmSim7020>,
+                      public TinyGsmTime<TinyGsmSim7020>,
+                      public TinyGsmNTP<TinyGsmSim7020>,
+                      public TinyGsmBattery<TinyGsmSim7020> {
+  friend class TinyGsmModem<TinyGsmSim7020>;
+  friend class TinyGsmGPRS<TinyGsmSim7020>;
+  friend class TinyGsmTCP<TinyGsmSim7020, TINY_GSM_MUX_COUNT>;
+  friend class TinyGsmSSL<TinyGsmSim7020>;
+  friend class TinyGsmCalling<TinyGsmSim7020>;
+  friend class TinyGsmSMS<TinyGsmSim7020>;
+  friend class TinyGsmGSMLocation<TinyGsmSim7020>;
+  friend class TinyGsmTime<TinyGsmSim7020>;
+  friend class TinyGsmNTP<TinyGsmSim7020>;
+  friend class TinyGsmBattery<TinyGsmSim7020>;
 
   /*
    * Inner Client
    */
  public:
-  class GsmClientSim800 : public GsmClient {
-    friend class TinyGsmSim800;
+  class GsmClientSim7020 : public GsmClient {
+    friend class TinyGsmSim7020;
 
    public:
-    GsmClientSim800() {}
+    GsmClientSim7020() {}
 
-    explicit GsmClientSim800(TinyGsmSim800& modem, uint8_t mux = 0) {
+    explicit GsmClientSim7020(TinyGsmSim7020& modem, uint8_t mux = 0) {
       init(&modem, mux);
     }
 
-    bool init(TinyGsmSim800* modem, uint8_t mux = 0) {
+    bool init(TinyGsmSim7020* modem, uint8_t mux = 0) {
       this->at       = modem;
       sock_available = 0;
       prev_check     = 0;
@@ -127,12 +127,12 @@ class TinyGsmSim800 : public TinyGsmModem<TinyGsmSim800>,
    * Inner Secure Client
    */
  public:
-  class GsmClientSecureSim800 : public GsmClientSim800 {
+  class GsmClientSecureSim7020 : public GsmClientSim7020 {
    public:
-    GsmClientSecureSim800() {}
+    GsmClientSecureSim7020() {}
 
-    explicit GsmClientSecureSim800(TinyGsmSim800& modem, uint8_t mux = 0)
-        : GsmClientSim800(modem, mux) {}
+    explicit GsmClientSecureSim7020(TinyGsmSim7020& modem, uint8_t mux = 0)
+        : GsmClientSim7020(modem, mux) {}
 
    public:
     int connect(const char* host, uint16_t port, int timeout_s) override {
@@ -149,7 +149,7 @@ class TinyGsmSim800 : public TinyGsmModem<TinyGsmSim800>,
    * Constructor
    */
  public:
-  explicit TinyGsmSim800(Stream& stream) : stream(stream) {
+  explicit TinyGsmSim7020(Stream& stream) : stream(stream) {
     memset(sockets, 0, sizeof(sockets));
   }
 
@@ -159,7 +159,7 @@ class TinyGsmSim800 : public TinyGsmModem<TinyGsmSim800>,
  protected:
   bool initImpl(const char* pin = NULL) {
     DBG(GF("### TinyGSM Version:"), TINYGSM_VERSION);
-    DBG(GF("### TinyGSM Compiled Module:  TinyGsmClientSIM800"));
+    DBG(GF("### TinyGSM Compiled Module:  TinyGsmClientSIM7020"));
 
     if (!testAT()) { return false; }
 
@@ -199,17 +199,7 @@ class TinyGsmSim800 : public TinyGsmModem<TinyGsmSim800>,
   }
 
   String getModemNameImpl() {
-    String name = "";
-#if defined(TINY_GSM_MODEM_SIM800)
-    name = "SIMCom SIM800";
-#elif defined(TINY_GSM_MODEM_SIM808)
-    name = "SIMCom SIM808";
-#elif defined(TINY_GSM_MODEM_SIM868)
-    name = "SIMCom SIM868";
-#elif defined(TINY_GSM_MODEM_SIM900)
-    name = "SIMCom SIM900";
-#endif
-
+    String name = "SIMCom SIM7020";
     sendAT(GF("+GMM"));
     String res2;
     if (waitResponse(1000L, res2) != 1) { return name; }
@@ -765,8 +755,8 @@ class TinyGsmSim800 : public TinyGsmModem<TinyGsmSim800>,
   Stream& stream;
 
  protected:
-  GsmClientSim800* sockets[TINY_GSM_MUX_COUNT];
+  GsmClientSim7020* sockets[TINY_GSM_MUX_COUNT];
   const char*      gsmNL = GSM_NL;
 };
 
-#endif  // SRC_TINYGSMCLIENTSIM800_H_
+#endif  // SRC_TINYGSMCLIENTSIM7020_H_

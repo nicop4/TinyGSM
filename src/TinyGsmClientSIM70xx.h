@@ -239,6 +239,24 @@ class TinyGsmSim70xx : public TinyGsmModem<TinyGsmSim70xx<modemType>>,
     return thisModem().getLocalIPImpl();
   }
 
+  bool setNetworkActive(){
+    return thisModem().setNetworkActiveImpl();
+  }
+
+  String getNetworkActive(){
+    return thisModem().getNetworkActiveImpl();
+  }
+
+  String getNetworkAPN(){
+    thisModem().sendAT("+CGNAPN");
+    if (waitResponse(GF(GSM_NL "+CGNAPN:")) != 1) { return ""; }
+    thisModem().streamSkipUntil('\"');
+    String res = thisModem().stream.readStringUntil('\"');
+    waitResponse();
+    return res;
+  }
+
+
   /*
    * GPRS functions
    */
@@ -288,6 +306,12 @@ class TinyGsmSim70xx : public TinyGsmModem<TinyGsmSim70xx<modemType>>,
     thisModem().sendAT(GF("+CGNSPWR=0"));
     if (thisModem().waitResponse() != 1) { return false; }
     return true;
+  }
+
+  bool isEnableGPSImpl(){
+    thisModem().sendAT(GF("+CGNSPWR?"));
+    if (thisModem().waitResponse(GF(GSM_NL "+CGNSPWR:")) != 1) { return false; }
+    return 1 == thisModem().streamGetIntBefore('\r'); 
   }
 
   // get the RAW GPS output

@@ -56,6 +56,22 @@ typedef TinyGsmSim5360::GsmClientSim5360 TinyGsmClient;
 typedef TinyGsmSim7600                   TinyGsm;
 typedef TinyGsmSim7600::GsmClientSim7600 TinyGsmClient;
 
+#elif defined(TINY_GSM_MODEM_A7670)
+#include "TinyGsmClientA7670.h"
+typedef TinyGsmA7670                   TinyGsm;
+typedef TinyGsmA7670::GsmClientA7670  TinyGsmClient;
+
+#elif defined(TINY_GSM_MODEM_A7608)
+#include "TinyGsmClientA7608.h"
+typedef TinyGsmA7608                    TinyGsm;
+typedef TinyGsmA7608::GsmClientA7608 TinyGsmClient;
+
+#elif defined(TINY_GSM_MODEM_SIM7020)
+#include "TinyGsmClientSIM7020.h"
+typedef TinyGsmSim7020                    TinyGsm;
+typedef TinyGsmSim7020::GsmClientSim7020 TinyGsmClient;
+
+
 #elif defined(TINY_GSM_MODEM_UBLOX)
 #include "TinyGsmClientUBLOX.h"
 typedef TinyGsmUBLOX                       TinyGsm;
