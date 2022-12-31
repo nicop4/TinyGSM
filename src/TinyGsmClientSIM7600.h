@@ -461,7 +461,7 @@ class TinyGsmSim7600 : public TinyGsmModem<TinyGsmSim7600>,
   }
 
   // get GPS informations
-  bool getGPSImpl(float* lat, float* lon, float* speed = 0, float* alt = 0,
+  bool getGPSImpl(uint8_t *status,float* lat, float* lon, float* speed = 0, float* alt = 0,
                   int* vsat = 0, int* usat = 0, float* accuracy = 0,
                   int* year = 0, int* month = 0, int* day = 0, int* hour = 0,
                   int* minute = 0, int* second = 0) {

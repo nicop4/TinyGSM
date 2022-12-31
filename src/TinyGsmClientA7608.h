@@ -475,12 +475,12 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
   }
 
   // get GPS informations
-  bool getGPSImpl(float* lat, float* lon, float* speed = 0, float* alt = 0,
+  bool getGPSImpl(uint8_t *status,float* lat, float* lon, float* speed = 0, float* alt = 0,
                   int* vsat = 0, int* usat = 0, float* accuracy = 0,
                   int* year = 0, int* month = 0, int* day = 0, int* hour = 0,
                   int* minute = 0, int* second = 0) {
     sendAT(GF("+CGNSSINFO"));
-    if (waitResponse(GF(GSM_NL "+CGNSSINFO:")) != 1) { return false; }
+    if (waitResponse(GF(GSM_NL "+CGNSSINFO: ")) != 1) { return false; }
 
     uint8_t fixMode = streamGetIntBefore(',');  // mode 2=2D Fix or 3=3DFix
                                                 // TODO(?) Can 1 be returned
@@ -522,8 +522,7 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       // UTC Time. Output format is hhmmss.s
       ihour = streamGetIntLength(2);  // Two digit hour
       imin  = streamGetIntLength(2);  // Two digit minute
-      secondWithSS =
-      streamGetFloatBefore(',');  // 4 digit second with subseconds
+      secondWithSS = streamGetFloatBefore(',');  // 4 digit second with subseconds
 
       ialt   = streamGetFloatBefore(',');  // MSL Altitude. Unit is meters
       ispeed = streamGetFloatBefore(',');  // Speed Over Ground. Unit is knots.
@@ -535,18 +534,13 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       streamSkipUntil('\n');  // TODO(?) is one more field reported??
 
       // Set pointers
-      if (lat != NULL)
-        *lat = (floor(ilat / 100) + fmod(ilat, 100.) / 60) *
-            (north == 'N' ? 1 : -1);
-      if (lon != NULL)
-        *lon = (floor(ilon / 100) + fmod(ilon, 100.) / 60) *
-            (east == 'E' ? 1 : -1);
+      if (lat != NULL)  *lat = ilat;
+      if (lon != NULL)  *lon = ilon;
       if (speed != NULL) *speed = ispeed;
       if (alt != NULL) *alt = ialt;
       if (vsat != NULL) *vsat = ivsat;
       if (usat != NULL) *usat = iusat;
       if (accuracy != NULL) *accuracy = iaccuracy;
-      if (iyear < 2000) iyear += 2000;
       if (year != NULL) *year = iyear;
       if (month != NULL) *month = imonth;
       if (day != NULL) *day = iday;
@@ -555,6 +549,11 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       if (second != NULL) *second = static_cast<int>(secondWithSS);
 
       waitResponse();
+      // Sometimes, although fix is displayed, 
+      // the value of longitude and latitude 0 will be set as invalid
+      if(ilat == 0 || ilon == 0){
+        return false;
+      }
       return true;
     }
     waitResponse();
