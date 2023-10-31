@@ -18,12 +18,13 @@ class TinyGsmGPS {
  public:
   /*
    * GPS/GNSS/GLONASS location functions
-   */
-  bool enableGPS() {
-    return thisModem().enableGPSImpl();
+   */ 
+  //power_en_pin: modem gpio number
+  bool enableGPS(int8_t power_en_pin = -1,uint8_t enable_level = 1) {
+    return thisModem().enableGPSImpl(power_en_pin,enable_level);
   }
-  bool disableGPS() {
-    return thisModem().disableGPSImpl();
+  bool disableGPS(int8_t power_en_pin =-1,uint8_t disbale_level = 0) {
+    return thisModem().disableGPSImpl(power_en_pin , disbale_level);
   }
   bool isEnableGPS() {
     return thisModem().isEnableGPSImpl();
@@ -47,14 +48,29 @@ class TinyGsmGPS {
                                   hour, minute, second);
   }
 
-  String setGNSSMode(uint8_t mode, bool dpo) {
-    return thisModem().setGNSSModeImpl(mode, dpo);
+  bool setGPSBaud(uint32_t baud){
+    return thisModem().setGPSBaudImpl(baud);
   }
 
-  uint8_t getGNSSMode() {
-    return thisModem().getGNSSModeImpl();
+  bool setGPSMode(uint8_t mode){
+    return thisModem().setGPSModeImpl(mode);
   }
 
+  bool setGPSOutputRate(uint8_t rate_hz){
+    return thisModem().setGPSOutputRateImpl(rate_hz);
+  }
+
+  bool enableNMEA(){
+    return thisModem().enableNMEAImpl();
+  }
+
+  bool disableNMEA(){
+    return thisModem().disableNMEAImpl();
+  }
+
+  bool configNMEASentence(bool CGA,bool GLL,bool GSA,bool GSV,bool RMC,bool VTG = 0,bool ZDA = 0,bool ANT = 0,bool DHV = 0,bool LPS = 0,bool UTC = 0,bool GST = 0){
+    return thisModem().configNMEASentenceImpl( CGA, GLL, GSA, GSV, RMC, VTG, ZDA, ANT, DHV, LPS, UTC, GST);
+  }
   /*
    * CRTP Helper
    */
@@ -70,8 +86,8 @@ class TinyGsmGPS {
    * GPS/GNSS/GLONASS location functions
    */
 
-  bool    enableGPSImpl() TINY_GSM_ATTR_NOT_IMPLEMENTED;
-  bool    disableGPSImpl() TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    enableGPSImpl(int8_t power_en_pin ,uint8_t enable_level) TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    disableGPSImpl(int8_t power_en_pin ,uint8_t disbale_level) TINY_GSM_ATTR_NOT_IMPLEMENTED;
   bool    isEnableGPSImpl() TINY_GSM_ATTR_NOT_IMPLEMENTED;
   String  getGPSrawImpl() TINY_GSM_ATTR_NOT_IMPLEMENTED;
   bool    getGPSImpl(uint8_t *status,float* lat, float* lon, float* speed = 0, float* alt = 0,
@@ -79,8 +95,12 @@ class TinyGsmGPS {
                      int* year = 0, int* month = 0, int* day = 0, int* hour = 0,
                      int* minute = 0,
                      int* second = 0) TINY_GSM_ATTR_NOT_IMPLEMENTED;
-  String  setGNSSModeImpl(uint8_t mode, bool dpo) TINY_GSM_ATTR_NOT_IMPLEMENTED;
-  uint8_t getGNSSModeImpl() TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    setGPSBaudImpl(uint32_t baud)TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    setGPSModeImpl(uint8_t mode)TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    setGPSOutputRateImpl(uint8_t rate_hz)TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    enableNMEAImpl()TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    disableNMEAImpl()TINY_GSM_ATTR_NOT_IMPLEMENTED;
+  bool    configNMEASentenceImpl()TINY_GSM_ATTR_NOT_IMPLEMENTED;
 };
 
 

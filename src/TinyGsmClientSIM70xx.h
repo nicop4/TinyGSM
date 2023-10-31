@@ -296,13 +296,13 @@ class TinyGsmSim70xx : public TinyGsmModem<TinyGsmSim70xx<modemType>>,
    */
  protected:
   // enable GPS
-  bool enableGPSImpl() {
+  bool enableGPSImpl(int8_t power_en_pin ,uint8_t enable_level) {
     thisModem().sendAT(GF("+CGNSPWR=1"));
     if (thisModem().waitResponse() != 1) { return false; }
     return true;
   }
 
-  bool disableGPSImpl() {
+  bool disableGPSImpl(int8_t power_en_pin ,uint8_t disbale_level) {
     thisModem().sendAT(GF("+CGNSPWR=0"));
     if (thisModem().waitResponse() != 1) { return false; }
     return true;

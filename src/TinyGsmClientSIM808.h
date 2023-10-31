@@ -27,13 +27,13 @@ class TinyGsmSim808 : public TinyGsmSim800, public TinyGsmGPS<TinyGsmSim808>, pu
    */
  protected:
   // enable GPS
-  bool enableGPSImpl() {
+  bool enableGPSImpl(int8_t power_en_pin ,uint8_t enable_level) {
     sendAT(GF("+CGNSPWR=1"));
     if (waitResponse() != 1) { return false; }
     return true;
   }
 
-  bool disableGPSImpl() {
+  bool disableGPSImpl(int8_t power_en_pin ,uint8_t disbale_level) {
     sendAT(GF("+CGNSPWR=0"));
     if (waitResponse() != 1) { return false; }
     return true;

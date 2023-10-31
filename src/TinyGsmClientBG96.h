@@ -326,13 +326,13 @@ class TinyGsmBG96 : public TinyGsmModem<TinyGsmBG96>,
    */
  protected:
   // enable GPS
-  bool enableGPSImpl() {
+  bool enableGPSImpl(int8_t power_en_pin ,uint8_t enable_level) {
     sendAT(GF("+QGPS=1"));
     if (waitResponse() != 1) { return false; }
     return true;
   }
 
-  bool disableGPSImpl() {
+  bool disableGPSImpl(int8_t power_en_pin ,uint8_t disbale_level) {
     sendAT(GF("+QGPSEND"));
     if (waitResponse() != 1) { return false; }
     return true;

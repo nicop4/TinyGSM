@@ -445,13 +445,13 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
    */
  protected:
   // enable GPS
-  bool enableGPSImpl() {
+  bool enableGPSImpl(int8_t power_en_pin ,uint8_t enable_level) {
     sendAT(GF("+CGNSSPWR=1"));  
-    if (waitResponse() != 1) { return false; }
+    if (waitResponse(10000UL,"+CGNSSPWR: READY!") != 1) { return false; }
     return true;
   }
 
-  bool disableGPSImpl() {
+  bool disableGPSImpl(int8_t power_en_pin ,uint8_t disbale_level) {
     sendAT(GF("+CGNSSPWR=0"));  
     if (waitResponse() != 1) { return false; }
     return true;
@@ -532,7 +532,9 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       streamSkipUntil(',');   // Horizontal Dilution Of Precision
       streamSkipUntil(',');   // Vertical Dilution Of Precision
       streamSkipUntil('\n');  // TODO(?) is one more field reported??
-
+      if (status){
+          *status = fixMode;
+      }
       // Set pointers
       if (lat != NULL)  *lat = ilat;
       if (lon != NULL)  *lon = ilon;
@@ -560,37 +562,43 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
     return false;
   }
 
-
-  /** 
-   *  Configure GNSS support mode
-   *  1 GPS
-   *  2 BDS
-   *  3 GPS + BDS
-   *  4 GLONASS
-   *  5 GPS + GLONASS
-   *  6 BDS + GLONASS
-   *  7 GPS + BDS + GLONASS
-   *  Note : The parameters are not necessarily 0~7, please use getGNSSMode to query the available parameters first
-   */
-  String setGNSSModeImpl(uint8_t mode,bool dpo) {
-    String res;
-    sendAT(GF("+CGNSSMODE="), mode);
-    if (waitResponse(10000L, res) != 1) { return ""; }
-    res.replace(GSM_NL, "");
-    res.trim();
-    return res;
+  bool setGPSBaudImpl(uint32_t baud){
+    sendAT("+CGNSSIPR=",baud);
+    return waitResponse(1000L) == 1;
   }
 
-  /**
-   * See setGNSSModeImpl parmrs
-   */
-  uint8_t getGNSSModeImpl() {
-    sendAT(GF("+CGNSSMODE?"));
-    if (waitResponse(GF(GSM_NL "+CGNSSMODE:")) != 1) { return 0; }
-    return stream.readStringUntil(',').toInt();
+  bool setGPSModeImpl(uint8_t mode){
+      sendAT("+CGNSSMODE=",mode);
+      return waitResponse(1000L) == 1;
   }
 
+  bool setGPSOutputRateImpl(uint8_t rate_hz){
+      sendAT("+CGPSNMEARATE=",rate_hz);
+      return waitResponse(1000L) == 1;
+  }
 
+  bool enableNMEAImpl(){
+      sendAT("+CGNSSTST=1");
+      waitResponse(1000L);
+    // Select the output port for NMEA sentence
+      sendAT("+CGNSSPORTSWITCH=0,1");
+      return waitResponse(1000L) == 1;
+  }
+
+  bool disableNMEAImpl(){
+      sendAT("+CGNSSTST=0");
+      waitResponse(1000L);
+    // Select the output port for NMEA sentence
+      sendAT("+CGNSSPORTSWITCH=1,0");
+      return waitResponse(1000L) == 1;
+  }
+
+  bool configNMEASentenceImpl(bool CGA,bool GLL,bool GSA,bool GSV,bool RMC,bool VTG,bool ZDA,bool ANT,bool DHV,bool LPS,bool UTC,bool GST){
+      // sendAT("+CGNSSNMEA=");
+      char buffer[128];
+      snprintf(buffer,128,"%u,%u,%u,%u,%u,%u,%u,0,0,0,0,%u", CGA, GLL, GSA, GSV, RMC, VTG, ZDA, GST);
+      return waitResponse(1000L) == 1;
+  }
   /*
    * Time functions
    */
