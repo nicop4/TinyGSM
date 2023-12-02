@@ -297,12 +297,20 @@ class TinyGsmSim70xx : public TinyGsmModem<TinyGsmSim70xx<modemType>>,
  protected:
   // enable GPS
   bool enableGPSImpl(int8_t power_en_pin ,uint8_t enable_level) {
+    if(power_en_pin != -1){
+      thisModem().sendAT("+CGPIO=0,",power_en_pin,",1,",enable_level);
+      thisModem().waitResponse();
+    } 
     thisModem().sendAT(GF("+CGNSPWR=1"));
     if (thisModem().waitResponse() != 1) { return false; }
     return true;
   }
 
   bool disableGPSImpl(int8_t power_en_pin ,uint8_t disbale_level) {
+    if(power_en_pin != -1){
+      thisModem().sendAT("+CGPIO=0,",power_en_pin,",1,",disbale_level);
+      thisModem().waitResponse();
+    } 
     thisModem().sendAT(GF("+CGNSPWR=0"));
     if (thisModem().waitResponse() != 1) { return false; }
     return true;
@@ -314,6 +322,56 @@ class TinyGsmSim70xx : public TinyGsmModem<TinyGsmSim70xx<modemType>>,
     return 1 == thisModem().streamGetIntBefore('\r'); 
   }
 
+  bool setGPSBaudImpl(uint32_t baud){
+    DBG("Modem does not support set GPS baudrate.");
+    return  false;
+  }
+
+  bool setGPSModeImpl(uint8_t mode){
+      thisModem().sendAT("+CGNSMOD=1,1,1,1");
+      return waitResponse(1000L) == 1;
+  }
+
+  bool setGPSOutputRateImpl(uint8_t rate_hz){
+    DBG("Modem does not support set GPS output rate.");
+    return  false;
+  }
+
+  bool enableNMEAImpl(){
+    // 7070G 2019.11.07 Delete commands,see datasheet  Version History
+    thisModem().sendAT("+CGNSPORT=3");
+    thisModem().waitResponse(1000UL);
+
+    thisModem().sendAT("+CGNSMOD=1,1,1,1");
+    if (thisModem().waitResponse(1000UL) !=  1) {
+        return false;
+    }
+
+    // 7070G 2019.11.07 Delete commands,see datasheet  Version History
+    thisModem().sendAT("+CGNSCFG=2");
+    thisModem().waitResponse(1000UL);
+
+    thisModem().sendAT("+CGNSTST=1");
+    if (thisModem().waitResponse(1000UL) !=  1) {
+        return false;
+    }
+    
+    thisModem().sendAT("+CGNSPWR=1");
+    if (thisModem().waitResponse(1000UL) !=  1) {
+        return false;
+    }
+    return true;
+  }
+
+  bool disableNMEAImpl(){
+    thisModem().sendAT("+CGNSTST=0");
+    return thisModem().waitResponse(1000L) == 1;
+  }
+
+  bool configNMEASentenceImpl(bool CGA,bool GLL,bool GSA,bool GSV,bool RMC,bool VTG,bool ZDA,bool ANT){
+    return false;
+  }
+  
   // get the RAW GPS output
   String getGPSrawImpl() {
     thisModem().sendAT(GF("+CGNSINF"));

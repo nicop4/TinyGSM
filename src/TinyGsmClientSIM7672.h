@@ -612,7 +612,7 @@ class TinyGsmSim7672 : public TinyGsmModem<TinyGsmSim7672>,
 
   bool configNMEASentenceImpl(bool CGA,bool GLL,bool GSA,bool GSV,bool RMC,bool VTG,bool ZDA,bool ANT){
       char buffer[32];
-      snprintf(buffer,32,"%u,%u,%u,%u,%u,%u,%u,%u", CGA, GLL, GSA, GSV, RMC, VTG, ZDA);
+      snprintf(buffer,32,"%u,%u,%u,%u,%u,%u,%u,0", CGA, GLL, GSA, GSV, RMC, VTG, ZDA);
       sendAT("+CGNSSNMEA=",buffer);
       return waitResponse(1000L) == 1;
   }
