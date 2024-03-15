@@ -1,7 +1,11 @@
 name: Build Examples with PlatformIO
 
 # Triggers the workflow on push or pull request events
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -34,14 +38,20 @@ jobs:
             TINY_GSM_MODEM_SIM7000,
             TINY_GSM_MODEM_SIM7000SSL,
             TINY_GSM_MODEM_SIM7070,
+            TINY_GSM_MODEM_A7670,
             TINY_GSM_MODEM_UBLOX,
             TINY_GSM_MODEM_SARAR4,
             TINY_GSM_MODEM_XBEE,
             TINY_GSM_MODEM_SEQUANS_MONARCH,
+            # added in this fork
+            TINY_GSM_MODEM_A7608,
+            TINY_GSM_MODEM_A7670,
+            TINY_GSM_MODEM_SIM7020,
+            TINY_GSM_MODEM_SIM7672
           ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set variables
         run: |
@@ -54,7 +64,7 @@ jobs:
           fi
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -65,7 +75,7 @@ jobs:
           pip install --upgrade platformio
 
       - name: Restore or Cache Platforms and Libraries
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v4
         id: cache_pio
         with:
           path: ~/.platformio
@@ -87,5 +97,5 @@ jobs:
           echo "${{ env.LIBRARY_INSTALL_SOURCE }}"
           pio lib --global install ${{ env.LIBRARY_INSTALL_SOURCE }}
           sed -i 's/\/\/ #define TINY_GSM_MODEM_SIM800/#define TINY_GSM_MODEM_SIM800/g' ${{ matrix.example }}/*
-          platformio ci --project-option='build_flags=-D ${{ env.TINYGSM_MODEM_TO_USE }}' --project-option='framework=arduino' --board=uno --board=leonardo --board=yun --board=megaatmega2560 --board=genuino101 --board=mkr1000USB --board=zero --board=teensy31 --board=bluepill_f103c8 --board=uno_pic32 --board=esp01 --board=nodemcuv2 --board=esp32dev
+          platformio ci --project-option='build_flags=-D ${{ env.TINYGSM_MODEM_TO_USE }}' --project-option='framework=arduino' --board=esp32dev --board=esp32s3box
           pio lib --global uninstall TinyGSM
