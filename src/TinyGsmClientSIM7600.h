@@ -488,7 +488,7 @@ class TinyGsmSim7600 : public TinyGsmModem<TinyGsmSim7600>,
     } 
     sendAT(GF("+CGPS=0"));
     if (waitResponse() != 1) { return false; }
-    return waitResponse(30000UL,"+CGPS: 0") == 1;
+    return waitResponse(30000UL,GF("+CGPS: 0")) == 1;
   }
 
   bool isEnableGPSImpl(){
