@@ -662,9 +662,27 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       if(!disableGPSImpl(-1,0)){
         return false;
       }
-      if(!enableGPSImpl(-1,0)){
-        return false;
-      }
+      // if(!enableGPSImpl(-1,0)){
+      //   return false;
+      // }
+      /*
+        20240507
+        A7600M7_B11V05_231108 version will not return <+CGNSSPWR: READY!> 
+        but will be returned in earlier versions. Redirect the NMEA sentence to the AT port and only check whether it returns OK.
+
+        Manufacturer: INCORPORATED
+        Model: A7608SA-H
+        Revision: A50C4B11A7600M7
+        A7600M7_B11V05_231108
+        QCN:
+        IMEI: XXXXXXXXXXXXXXXXXXX
+        MEID:
+        +GCAP: +CGSM,+FCLASS,+DS
+        DeviceInfo:
+      * 
+      * * */
+      sendAT(GF("+CGNSSPWR=1"));  
+      if (waitResponse(10000UL) != 1) { return false; }
       return true;
   }
 
