@@ -573,12 +573,13 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       int   ihour        = 0;
       int   imin         = 0;
       float secondWithSS = 0;
-
-      streamSkipUntil(',');               // GPS satellite valid numbers
-      streamSkipUntil(',');               // GLONASS satellite valid numbers
-      //! This bit in the A7608 manual should represent BEIDOU satellite valid numbers, 
-      //! but it does not.
-      // streamSkipUntil(',');               // BEIDOU satellite valid numbers
+      // 20240513 fixed
+      // A7600M7_B11V05_231108
+      // +CGNSSINFO: 3,13,14,,,xx.xxxx,N,xx.xxxx,E,130524,035736.00,53.6,0.000,,1.7,1.2,1.1,
+      streamSkipUntil(',');               // GPS-SVs      satellite valid numbers
+      streamSkipUntil(',');               // BEIDOU-SVs   satellite valid numbers
+      streamSkipUntil(',');               // GLONASS-SVs  satellite valid numbers
+      streamSkipUntil(',');               // GALILEO-SVs  satellite valid numbers
       ilat  = streamGetFloatBefore(',');  // Latitude in ddmm.mmmmmm
       /* north =  */stream.read();              // N/S Indicator, N=north or S=south
       streamSkipUntil(',');
@@ -659,12 +660,27 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
       if(waitResponse(1000L) != 1){
           return false;
       }
-      if(!disableGPSImpl(-1,0)){
-        return false;
-      }
-      // if(!enableGPSImpl(-1,0)){
-      //   return false;
-      // }
+
+
+    /*
+        20240513 
+        Manufacturer: INCORPORATED
+        Model: A7608E-H
+        Revision: A50C4B11A7600M7
+        A7600M7_B11V05_231108
+        QCN:
+        IMEI: 861513066221920
+        MEID:
+        +GCAP: +CGSM,+FCLASS,+DS
+        DeviceInfo:
+      A7600M7_B11V05_231108 version removes turning off GPS when NMEA is enabled
+      REMOVE:
+        // if(!disableGPSImpl(-1,0)){
+        //   return false;
+        // }
+    * * * * */
+
+
       /*
         20240507
         A7600M7_B11V05_231108 version will not return <+CGNSSPWR: READY!> 
@@ -679,10 +695,13 @@ class TinyGsmA7608 : public TinyGsmModem<TinyGsmA7608>,
         MEID:
         +GCAP: +CGSM,+FCLASS,+DS
         DeviceInfo:
+        // if(!enableGPSImpl(-1,0)){
+        //   return false;
+        // }
       * 
       * * */
-      sendAT(GF("+CGNSSPWR=1"));  
-      if (waitResponse(10000UL) != 1) { return false; }
+      // sendAT(GF("+CGNSSPWR=1"));  
+      // if (waitResponse(10000UL) != 1) { return false; }
       return true;
   }
 
