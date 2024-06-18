@@ -78,7 +78,8 @@ public:
         const char *clientID,
         const char *username = NULL,
         const char *password = NULL,
-        uint32_t keepalive_time = 60)
+        uint32_t keepalive_time = 60,
+        int mqttVersion = 3)
     {
         uint8_t authMethod = 0;
 
@@ -163,6 +164,11 @@ public:
         thisModem().waitResponse(3000);
 
         thisModem().sendAT("+CMQTTACCQ=", clientIndex, ",\"", clientID, "\",", __ssl);
+
+        if(mqttVersion != 3) {
+            thisModem().sendAT("+CMQTTCFG=\"version\",",clientIndex,",",mqttVersion);
+            thisModem().waitResponse();
+        }
 
         if (thisModem().waitResponse(3000) != 1)return false;
         if (username && password) {
